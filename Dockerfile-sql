@@ -1,0 +1,5 @@
+FROM mysql:5.7.15
+ADD init.sql /data/application/init.sql
+EXPOSE 3306
+
+

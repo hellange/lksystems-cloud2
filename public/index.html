@@ -1,0 +1,175 @@
+<script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <script type="text/javascript">
+
+        var dataPoints_bad = [];
+        var dataPoints_stue = [];
+        var dataPoints_gang = [];
+        var dataPoints_soverom = [];
+        var dataPoints_gjesterom = [];
+
+        var dataPoints_heating = [];
+
+        var chart;
+
+        window.onload = function () {
+            chart = createChart();
+            fillInData(7);
+        }
+
+        function fillInData(days) {
+
+            dataPoints_bad.length = 0;
+            dataPoints_stue.length = 0;
+            dataPoints_gang.length = 0;
+            dataPoints_soverom.length = 0;
+            dataPoints_gjesterom.length = 0;
+            dataPoints_heating.length = 0;
+
+            console.log("Fill in data for #days=", days);
+            var r = "/api/data";
+            if (days>0) {
+                r += "?days="+days;
+            }
+            $.getJSON(r, function(data) {
+                console.log("Got json data:", data)
+                var thermostatData = data;
+                $('#bad').text(data.thermostats[0].thermostats[0].actualRoomTemp);
+                $('#bad')
+
+                $('#stue').text(data.thermostats[0].thermostats[1].actualRoomTemp);
+                $('#gang').text(data.thermostats[0].thermostats[2].actualRoomTemp);
+                $('#soverom').text(data.thermostats[0].thermostats[3].actualRoomTemp);
+                $('#gjesterom').text(data.thermostats[0].thermostats[4].actualRoomTemp);
+
+
+                $.each(data.thermostats, function(key, value){
+
+                    dataPoints_bad.push({x: new Date(value.creation_time), y: parseFloat(value.thermostats[0].actualRoomTemp)});
+                    dataPoints_stue.push({x: new Date(value.creation_time), y: parseFloat(value.thermostats[1].actualRoomTemp)});
+                    dataPoints_gang.push({x: new Date(value.creation_time), y: parseFloat(value.thermostats[2].actualRoomTemp)});
+                    dataPoints_soverom.push({x: new Date(value.creation_time), y: parseFloat(value.thermostats[3].actualRoomTemp)});
+                    dataPoints_gjesterom.push({x: new Date(value.creation_time), y: parseFloat(value.thermostats[4].actualRoomTemp)});
+
+                    var heating =
+                        parseInt(value.thermostats[0].heatingStatus)
+                        + parseInt(value.thermostats[1].heatingStatus)
+                        + parseInt(value.thermostats[2].heatingStatus)
+                        + parseInt(value.thermostats[3].heatingStatus)
+                        + parseInt(value.thermostats[4].heatingStatus);
+
+                    //console.log("Combined heating", heating);
+
+                    dataPoints_heating.push({x: new Date(value.creation_time), y: heating});
+
+                });
+
+                chart.render();
+            });
+        }
+
+        function createChart() {
+            var chart = new CanvasJS.Chart("chartContainer",{
+                title:{
+                    //text:"Trend"
+                },
+                zoomEnabled: true,
+                zoomType: "xy",
+                axisX:{
+                    //title: 'Dato / Tid (UTC)'
+                },
+                axisY:{
+                    title: 'Temperatur (C)',
+                    valueFormatString: '##.#',
+                },
+                data: [
+                    {
+                        type: "line",
+                        legendText: "Bad",
+                        showInLegend: true,
+                        dataPoints : dataPoints_bad,
+                    },
+                    {
+                        type: "line",
+                        legendText: "Stue",
+                        showInLegend: true,
+                        dataPoints : dataPoints_stue,
+                    }, {
+                        type: "line",
+                        legendText: "Gang",
+                        showInLegend: true,
+                        dataPoints : dataPoints_gang,
+                    }, {
+                        type: "line",
+                        legendText: "Soverom",
+                        showInLegend: true,
+                        dataPoints : dataPoints_soverom,
+                    }, {
+                        type: "line",
+                        legendText: "Gjesterom",
+                        showInLegend: true,
+                        dataPoints : dataPoints_gjesterom,
+                    },{
+                        type: "line",
+                        legendText: "Heating",
+                        showInLegend: true,
+                        dataPoints : dataPoints_heating,
+                    }
+                ]
+            });
+            return chart;
+        }
+
+        function refresh(days) {
+            console.log("REFRESH");
+            fillInData(days);
+
+        }
+    </script>
+
+</head>
+<body>
+
+<div style="padding-left:10%; width: 95%;">
+    <table>
+        <tr>
+            <td>Bad</td>
+            <td>Stue</td>
+            <td>Gang</td>
+            <td>Soverom</td>
+            <td>Gjesterom</td>
+        </tr>
+        <tr>
+            <td style="width:20%"><h2><span id="bad"/></h2></td>
+            <td style="width:20%"><h2><span id="stue"/></h2></td>
+            <td style="width:20%"><h2><span id="gang"/></h2></td>
+            <td style="width:20%"><h2><span id="soverom"/></h2></td>
+            <td style="width:20%"><h2><span id="gjesterom"/></h2></td>
+
+        <tr>
+
+        <tr>
+            <td>
+                <select onchange="javascript:refresh(this.value)">
+                    <option value="1">Last 24 hours</option>
+                    <option value="7" selected="selected">Last 7 days</option>
+                    <option value="28">Last 4 weeks</option>
+                    <option value="90">Last 3 months</option>
+                </select>
+            </td>
+
+
+        </tr>
+
+    </table>
+
+</div>
+
+
+<div id="chartContainer" style="height: 500px; padding-left:2%; width: 95%;"></div>
+</body>
+</html>
