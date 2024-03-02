@@ -1,6 +1,6 @@
 ## About
 A webapp for:
-- Collecting temperature data from my LK Systems (https://www.lksystems.no/) heat system though the LKSystems cloud server (https://my.lk.nu/)
+- Collecting temperature data from my LK Systems (https://www.lksystems.no/) floor heating system though the LKSystems cloud server (https://my.lk.nu/)
 - Storing historical data in a database and present them as graphs in dashboard.
 - Optimized and tailored for my own LKSystem installation with 5 temperature sensors, but may serve as basis for other projects as well.
 
