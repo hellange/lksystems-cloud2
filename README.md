@@ -4,7 +4,7 @@ A webapp for:
 - Storing historical data in a database and present them as graphs in dashboard.
 - Optimized and tailored for my own LKSystem installation with 5 temperature sensors, but may serve as basis for other projects as well.
 
-Written in node and uses mysql database.
+Implemented using typescript, node, mysql db.
 
 Based on [lksystems](https://github.com/hellange/lksystems) that fetched data from local webserver (old LKSystems webserver)
 
